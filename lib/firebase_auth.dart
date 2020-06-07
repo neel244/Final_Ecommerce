@@ -3,6 +3,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthProvider {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  String useremail = "";
 
   Future<bool> getCurrentUserEmail() async {
     //final user = await _auth.currentUser().then((value) => userEmail = value.email);

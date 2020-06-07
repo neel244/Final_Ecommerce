@@ -1,3 +1,5 @@
+import 'package:auth/checkout.dart';
+import 'package:auth/favourite_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_pro/carousel_pro.dart';
@@ -7,6 +9,9 @@ import 'cart.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'firebase_auth.dart';
 import 'admin.dart';
+import 'myaccount.dart';
+import 'checkout.dart';
+import 'adminpassword.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -14,7 +19,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool isAdmin = false;
+  TextEditingController _password = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    _password = TextEditingController(text: "");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,16 +59,7 @@ class _HomePageState extends State<HomePage> {
               Icons.search,
               color: Colors.white,
             ),
-            onPressed: () {
-              Fluttertoast.showToast(
-                  msg: "You Have Successfully Logged In ",
-                  toastLength: Toast.LENGTH_LONG,
-                  gravity: ToastGravity.CENTER,
-                  timeInSecForIosWeb: 1,
-                  backgroundColor: Colors.black,
-                  textColor: Colors.white,
-                  fontSize: 18.0);
-            },
+            onPressed: () {},
           ),
           new IconButton(
             icon: Icon(
@@ -66,8 +67,8 @@ class _HomePageState extends State<HomePage> {
               color: Colors.white,
             ),
             onPressed: () {
-              Navigator.push(
-                  context, new MaterialPageRoute(builder: (context) => Cart()));
+              Navigator.push(context,
+                  new MaterialPageRoute(builder: (context) => Checkout()));
             },
           )
         ],
@@ -78,7 +79,7 @@ class _HomePageState extends State<HomePage> {
           //header
           UserAccountsDrawerHeader(
             decoration: new BoxDecoration(color: Colors.red),
-            accountName: Text('Neel Gada'),
+            accountName: Text("Neel"),
             accountEmail: Text('neel.hg@somaiya.edu'),
             currentAccountPicture: GestureDetector(
                 child: new CircleAvatar(
@@ -102,25 +103,28 @@ class _HomePageState extends State<HomePage> {
           ),
 
           InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => MyAccountPage()));
+            },
             child: ListTile(
               title: Text('My Account'),
               leading: Icon(Icons.person, color: Colors.red),
             ),
           ),
 
-          InkWell(
-            onTap: () {},
-            child: ListTile(
-              title: Text('My Orders'),
-              leading: Icon(Icons.shopping_cart, color: Colors.red),
-            ),
-          ),
+          // InkWell(
+          //   onTap: () {},
+          //   child: ListTile(
+          //     title: Text('My Orders'),
+          //     leading: Icon(Icons.shopping_cart, color: Colors.red),
+          //   ),
+          // ),
 
           InkWell(
             onTap: () {
-              Navigator.push(
-                  context, new MaterialPageRoute(builder: (context) => Cart()));
+              Navigator.push(context,
+                  new MaterialPageRoute(builder: (context) => Checkout()));
             },
             child: ListTile(
               title: Text('Shopping Cart'),
@@ -129,7 +133,10 @@ class _HomePageState extends State<HomePage> {
           ),
 
           InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => FavouriteList()));
+            },
             child: ListTile(
               title: Text('Favourites'),
               leading: Icon(
@@ -141,21 +148,21 @@ class _HomePageState extends State<HomePage> {
 
           Divider(),
 
-          InkWell(
-            onTap: () {},
-            child: ListTile(
-              title: Text('Settings'),
-              leading: Icon(Icons.settings, color: Colors.red),
-            ),
-          ),
+          // InkWell(
+          //   onTap: () {},
+          //   child: ListTile(
+          //     title: Text('Settings'),
+          //     leading: Icon(Icons.settings, color: Colors.red),
+          //   ),
+          // ),
 
-          InkWell(
-            onTap: () {},
-            child: ListTile(
-              title: Text('About'),
-              leading: Icon(Icons.help, color: Colors.red),
-            ),
-          ),
+          // InkWell(
+          //   onTap: () {},
+          //   child: ListTile(
+          //     title: Text('About'),
+          //     leading: Icon(Icons.help, color: Colors.red),
+          //   ),
+          // ),
 
           InkWell(
             onTap: () {
@@ -170,8 +177,49 @@ class _HomePageState extends State<HomePage> {
             onTap: () async {
               bool res = await AuthProvider().getCurrentUserEmail();
               if (res) {
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => Admin()));
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return new AlertDialog(
+                        title: Text("Security key"),
+                        content: TextField(
+                          controller: _password,
+                          decoration: InputDecoration(
+                              labelText: 'Enter Security Key',
+                              labelStyle: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey),
+                              focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.red))),
+                          obscureText: true,
+                        ),
+                        actions: <Widget>[
+                          MaterialButton(
+                            onPressed: () {
+                              if (_password.text == "admin1234") {
+                                Navigator.pop(context);
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Admin()));
+                              } else {
+                                Fluttertoast.showToast(
+                                    msg: "Invalid Password",
+                                    toastLength: Toast.LENGTH_LONG,
+                                    gravity: ToastGravity.CENTER,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.black,
+                                    textColor: Colors.white,
+                                    fontSize: 19.0);
+                              }
+                            },
+                            child: Text("Enter"),
+                          )
+                        ],
+                      );
+                    });
+                // Navigator.push(context,
+                //     MaterialPageRoute(builder: (context) => AdminPassword()));
               }
             },
             child: ListTile(

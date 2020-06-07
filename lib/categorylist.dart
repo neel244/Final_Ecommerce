@@ -20,16 +20,20 @@ class _CategoryListState extends State<CategoryList> {
       body: StreamBuilder(
         stream: Firestore.instance.collection('categories').snapshots(),
         builder: (context, snapshot) {
-          return ListView.builder(
-            itemCount: snapshot.data.documents.length,
-            itemBuilder: (context, index) {
-              DocumentSnapshot categories = snapshot.data.documents[index];
-              return ListTile(
-                leading: Icon(Icons.category),
-                title: Text(categories['category']),
-              );
-            },
-          );
+          if (snapshot.hasData) {
+            return ListView.builder(
+              itemCount: snapshot.data.documents.length,
+              itemBuilder: (context, index) {
+                DocumentSnapshot categories = snapshot.data.documents[index];
+                return ListTile(
+                  leading: Icon(Icons.category),
+                  title: Text(categories['category']),
+                );
+              },
+            );
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
         },
       ),
     );

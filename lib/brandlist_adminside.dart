@@ -20,16 +20,20 @@ class _BrandListState extends State<BrandList> {
       body: StreamBuilder(
         stream: Firestore.instance.collection('brands').snapshots(),
         builder: (context, snapshot) {
-          return ListView.builder(
-            itemCount: snapshot.data.documents.length,
-            itemBuilder: (context, index) {
-              DocumentSnapshot categories = snapshot.data.documents[index];
-              return ListTile(
-                leading: Icon(Icons.shop),
-                title: Text(categories['brand']),
-              );
-            },
-          );
+          if (!snapshot.hasData) {
+            return Center(child: CircularProgressIndicator());
+          } else {
+            return ListView.builder(
+              itemCount: snapshot.data.documents.length,
+              itemBuilder: (context, index) {
+                DocumentSnapshot categories = snapshot.data.documents[index];
+                return ListTile(
+                  leading: Icon(Icons.shop),
+                  title: Text(categories['brand']),
+                );
+              },
+            );
+          }
         },
       ),
     );

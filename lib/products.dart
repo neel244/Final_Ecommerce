@@ -8,104 +8,37 @@ class Products extends StatefulWidget {
 }
 
 class _ProductsState extends State<Products> {
-  var product_list = [
-    {
-      "name": "Blazer",
-      "picture": "images/blazer1.jpeg",
-      "old_price": 120,
-      "price": 85
-    },
-
-    {
-      "name": "Red Dress",
-      "picture": "images/red_dress.jpg",
-      "old_price": 100,
-      "price": 50
-    },
-    // {
-    //   "name": "Dress",
-    //   "picture": "images/dress2.jpeg",
-    //   "old_price": 120,
-    //   "new_price": 85
-    // },
-
-    // {
-    //   "name": "Dress",
-    //   "picture": "images/dress1.jpeg",
-    //   "old_price": 120,
-    //   "new_price": 85
-    // },
-
-    // {
-    //   "name": "Heals",
-    //   "picture": "images/hills2.jpeg",
-    //   "old_price": 120,
-    //   "new_price": 85
-    // },
-
-    {
-      "name": "pants",
-      "picture": "images/pants1.jpg",
-      "old_price": 120,
-      "price": 85
-    },
-
-    {
-      "name": "pantwa",
-      "picture": "images/pants2.jpeg",
-      "old_price": 120,
-      "price": 85
-    },
-
-    {
-      "name": "blazer2",
-      "picture": "images/blazer2.jpeg",
-      "old_price": 120,
-      "price": 85
-    },
-
-    {
-      "name": "dress2",
-      "picture": "images/dress2.jpeg",
-      "old_price": 120,
-      "price": 85
-    },
-
-    {
-      "name": "heals",
-      "picture": "images/hills2.jpeg",
-      "old_price": 120,
-      "price": 85
-    },
-
-    {
-      "name": "shoe1",
-      "picture": "images/shoe1.jpg",
-      "old_price": 120,
-      "price": 85
-    },
-  ];
-
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: StreamBuilder(
             stream: Firestore.instance.collection('productsell').snapshots(),
             builder: (context, snapshot) {
-              return GridView.builder(
-                  itemCount: snapshot.data.documents.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2),
-                  itemBuilder: (BuildContext context, int index) {
-                    DocumentSnapshot products = snapshot.data.documents[index];
-                    return Single_prod(
-                        prod_name: products['name'],
-                        prod_picture: products['images'],
-                        prod_old_price: products['quantity'],
-                        // product_list[index]['quantity'].toString(),
-                        prod_price: products['price']);
-                    // product_list[index]['price'].toString());
-                  });
+              if (snapshot.hasData) {
+                return GridView.builder(
+                    itemCount: snapshot.data.documents.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2),
+                    itemBuilder: (BuildContext context, int index) {
+                      DocumentSnapshot products =
+                          snapshot.data.documents[index];
+                      return Single_prod(
+                          prod_name: products['name'],
+                          prod_picture: products['images'],
+                          prod_quantity: products['quantity'],
+                          // product_list[index]['quantity'].toString(),
+                          prod_price: products['price'],
+                          prod_brand: products['brand'],
+                          prod_category: products['category'],
+                          prod_id: products['id']
+                          // prod_size: products['price'],
+                          );
+                      // product_list[index]['price'].toString());
+                    });
+              } else {
+                return CircularProgressIndicator();
+              }
             }));
   }
 }
@@ -113,14 +46,20 @@ class _ProductsState extends State<Products> {
 class Single_prod extends StatelessWidget {
   final prod_name;
   final prod_picture;
-  final prod_old_price;
+  final prod_quantity;
   final prod_price;
+  final prod_brand;
+  final prod_category;
+  final prod_id;
 
   Single_prod(
       {this.prod_name,
       this.prod_picture,
-      this.prod_old_price,
-      this.prod_price});
+      this.prod_quantity,
+      this.prod_price,
+      this.prod_brand,
+      this.prod_category,
+      this.prod_id});
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -130,11 +69,13 @@ class Single_prod extends StatelessWidget {
         child: InkWell(
             onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                 builder: (context) => ProductDetails(
-                      product_detail_name: prod_name,
-                      product_detail_new_price: prod_price,
-                      product_detail_old_price: prod_old_price,
-                      product_detail_picture: prod_picture,
-                    ))),
+                    product_detail_name: prod_name,
+                    product_detail_new_price: prod_price,
+                    product_detail_quantity: prod_quantity,
+                    product_detail_picture: prod_picture,
+                    product_detail_brand: prod_brand,
+                    product_detail_category: prod_category,
+                    product_detail_id: prod_id))),
             // Navigator.of(context).push(new MaterialPageRoute(builder: (context)=> new ProductDetails())),
             child: GridTile(
               footer: Container(

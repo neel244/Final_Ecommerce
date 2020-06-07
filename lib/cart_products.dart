@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Cart_products extends StatefulWidget {
   @override
@@ -26,20 +27,51 @@ class _Cart_productsState extends State<Cart_products> {
   ];
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        itemCount: Products_on_the_cart.length,
-        itemBuilder: (context, index) {
-          return Single_cart_product(
-            cart_prod_name: Products_on_the_cart[index]["name"],
-            cart_prod_color: Products_on_the_cart[index]["color"],
-            cart_prod_qty: Products_on_the_cart[index]["quantity"],
-            cart_prod_size: Products_on_the_cart[index]["size"],
-            cart_prod_price: Products_on_the_cart[index]["price"],
-            cart_prod_picture: Products_on_the_cart[index]["picture"],
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blue[600],
+        title: Text(
+          "Cart",
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+      body: StreamBuilder(
+        stream: Firestore.instance.collection('cart').snapshots(),
+        builder: (context, snapshot) {
+          return ListView.builder(
+            itemCount: snapshot.data.documents.length,
+            itemBuilder: (context, index) {
+              DocumentSnapshot products = snapshot.data.documents[index];
+              return Single_cart_product(
+                cart_prod_name: products["name"],
+                // cart_prod_color: Products_on_the_cart[index]["color"],
+                cart_prod_qty: products["quantity"],
+                // cart_prod_size: Products_on_the_cart[index]["size"],
+                cart_prod_price: products["price"],
+                cart_prod_picture: products["picture"],
+              );
+            },
           );
-        });
+        },
+      ),
+    );
   }
 }
+//   return Scaffold(
+//   appBar: ,
+//   return ListView.builder(
+//       itemCount: Products_on_the_cart.length,
+//       itemBuilder: (context, index) {
+//         return Single_cart_product(
+//           cart_prod_name: Products_on_the_cart[index]["name"],
+//           cart_prod_color: Products_on_the_cart[index]["color"],
+//           cart_prod_qty: Products_on_the_cart[index]["quantity"],
+//           cart_prod_size: Products_on_the_cart[index]["size"],
+//           cart_prod_price: Products_on_the_cart[index]["price"],
+//           cart_prod_picture: Products_on_the_cart[index]["picture"],
+//         );
+//       }););
+// }
 
 class Single_cart_product extends StatelessWidget {
   final cart_prod_name;
@@ -62,17 +94,8 @@ class Single_cart_product extends StatelessWidget {
     return Card(
       child: ListTile(
         // =====================Leading Section=============
-        leading: new Container(
-          height: 120.0,
-          width: 80.0,
-          decoration: new BoxDecoration(
-            image: DecorationImage(
-              image: new AssetImage(cart_prod_picture),
-              fit: BoxFit.fill,
-            ),
-            // shape: BoxShape.circle,
-          ),
-        ),
+        leading: Container(child: new Image.network(cart_prod_picture)),
+
         // ====================title section=========
         title: Padding(
           padding: const EdgeInsets.fromLTRB(5.0, 0, 0, 0),
